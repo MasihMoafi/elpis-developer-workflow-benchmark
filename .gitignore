@@ -1,0 +1,9 @@
+.env
+.env.*
+!.env.example
+__pycache__/
+.codex/
+results/runs/*
+!results/runs/.gitkeep
+benchmark/results/runs/*/elpis-state/
+benchmark/results/runs/*/workspace/.git/

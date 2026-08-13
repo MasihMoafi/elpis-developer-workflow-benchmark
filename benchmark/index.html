@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Elpis Developer Workflow Benchmark</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --background: light-dark(#f4f6f9, #0d1117);
+      --foreground: light-dark(#17202b, #eef2f7);
+      --card: light-dark(#ffffff, #151b23);
+      --card-foreground: light-dark(#17202b, #eef2f7);
+      --muted: light-dark(#eef1f5, #1d2631);
+      --muted-foreground: light-dark(#657181, #aeb9c7);
+      --border: light-dark(#dbe1e8, #303b49);
+      --primary: light-dark(#315ee7, #84a5ff);
+      --primary-foreground: light-dark(#ffffff, #0d1117);
+      --green: light-dark(#18794e, #57d39a);
+      --amber: light-dark(#99631b, #e9b65f);
+      --purple: light-dark(#7040b8, #be98ff);
+      --red: light-dark(#a93b42, #ff8990);
+      --shadow: 0 18px 60px light-dark(rgb(23 32 43 / .08), rgb(0 0 0 / .28));
+      --radius: 18px;
+      --font-size-base: 16px;
+    }
+
+    * { box-sizing: border-box; }
+    html { background: var(--background); }
+    body {
+      background: var(--background);
+      color: var(--foreground);
+      font: 400 var(--font-size-base)/1.55 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+    }
+    a { color: var(--primary); }
+    button, summary { font: inherit; }
+    button:focus-visible, summary:focus-visible, a:focus-visible { outline: 3px solid var(--primary); outline-offset: 3px; }
+
+    .page { margin: 0 auto; max-width: 1120px; padding: 32px 22px 72px; }
+    .hero { align-items: flex-start; display: flex; gap: 28px; justify-content: space-between; padding: 42px 0 34px; }
+    .eyebrow { color: var(--primary); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; }
+    h1 { font-size: clamp(38px, 7vw, 78px); letter-spacing: -.065em; line-height: .98; margin: 12px 0 18px; max-width: 790px; }
+    .lede { color: var(--muted-foreground); font-size: clamp(17px, 2.3vw, 22px); line-height: 1.35; margin: 0; max-width: 720px; }
+    .status { background: var(--muted); border: 1px solid var(--border); border-radius: 999px; color: var(--muted-foreground); font-size: 12px; letter-spacing: .08em; padding: 9px 13px; white-space: nowrap; }
+    .status strong { color: var(--amber); font-weight: 500; }
+
+    .panel { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+    .claim { display: grid; gap: 26px; grid-template-columns: minmax(0, 1.25fr) minmax(260px, .75fr); padding: 26px; }
+    .label { color: var(--muted-foreground); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; }
+    .claim h2 { font-size: clamp(24px, 3vw, 36px); letter-spacing: -.04em; line-height: 1.08; margin: 9px 0 0; }
+    .claim-side { border-left: 1px solid var(--border); display: grid; gap: 15px; padding-left: 24px; }
+    .claim-side p { margin: 0; }
+    .claim-side strong { display: block; font-weight: 500; margin-bottom: 3px; }
+    .muted { color: var(--muted-foreground); }
+
+    .section { margin-top: 64px; }
+    .section-heading { align-items: end; display: flex; gap: 18px; justify-content: space-between; margin-bottom: 18px; }
+    h2 { font-size: clamp(24px, 4vw, 38px); letter-spacing: -.045em; line-height: 1.05; margin: 0; }
+    .section-heading p { color: var(--muted-foreground); margin: 0; max-width: 420px; text-align: right; }
+
+    .flow { align-items: stretch; display: grid; gap: 10px; grid-template-columns: 1fr 28px 1fr 28px 1fr; }
+    .flow-step { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 19px; }
+    .flow-step .number { color: var(--primary); font-size: 12px; }
+    .flow-step h3 { font-size: 18px; margin: 12px 0 5px; }
+    .flow-step p { color: var(--muted-foreground); font-size: 14px; margin: 0; }
+    .flow-arrow { align-self: center; color: var(--muted-foreground); font-size: 24px; text-align: center; }
+
+    .arms { display: grid; gap: 10px; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 10px; }
+    .arm { border-radius: 14px; padding: 16px 18px; }
+    .arm.direct { background: color-mix(in srgb, var(--primary) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--primary) 35%, var(--border)); }
+    .arm.elpis { background: color-mix(in srgb, var(--green) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--green) 35%, var(--border)); }
+    .arm strong { display: block; font-weight: 500; }
+    .arm span { color: var(--muted-foreground); font-size: 13px; }
+
+    .families { display: grid; gap: 12px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .family { background: var(--card); border: 1px solid var(--border); border-radius: 15px; min-height: 190px; padding: 19px; }
+    .family-top { align-items: center; display: flex; gap: 10px; justify-content: space-between; }
+    .family-dot { background: var(--primary); border-radius: 50%; height: 10px; width: 10px; }
+    .family:nth-child(2) .family-dot { background: var(--green); }
+    .family:nth-child(3) .family-dot { background: var(--amber); }
+    .family:nth-child(4) .family-dot { background: var(--purple); }
+    .family:nth-child(5) .family-dot { background: var(--red); }
+    .family:nth-child(6) .family-dot { background: var(--primary); }
+    .family-count { color: var(--muted-foreground); font-size: 12px; }
+    .family h3 { font-size: 19px; letter-spacing: -.02em; margin: 19px 0 7px; }
+    .family p { color: var(--muted-foreground); font-size: 14px; margin: 0; }
+    .family details { border-top: 1px solid var(--border); margin-top: 17px; padding-top: 11px; }
+    .family summary { color: var(--primary); cursor: pointer; font-size: 13px; }
+    .family details p { margin-top: 9px; }
+
+    .measure-grid { display: grid; gap: 10px; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .measure { background: var(--muted); border-radius: 13px; padding: 17px; }
+    .measure strong { display: block; font-size: 16px; font-weight: 500; }
+    .measure span { color: var(--muted-foreground); display: block; font-size: 13px; margin-top: 5px; }
+
+    .pilot-grid { display: grid; gap: 12px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .pilot-card { background: var(--card); border: 1px solid var(--border); border-radius: 15px; padding: 19px; }
+    .pilot-top { align-items: baseline; display: flex; gap: 12px; justify-content: space-between; }
+    .pilot-top strong { font-size: 17px; font-weight: 500; }
+    .pilot-top span { color: var(--muted-foreground); font-size: 12px; }
+    .pilot-results { display: grid; gap: 8px; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 18px 0 13px; }
+    .result { border-radius: 9px; display: block; font-size: 13px; padding: 10px 12px; }
+    .result b { display: block; font-size: 15px; font-weight: 600; margin-top: 2px; }
+    .result.direct { background: color-mix(in srgb, var(--primary) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--primary) 35%, var(--border)); }
+    .result.elpis { background: color-mix(in srgb, var(--green) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--green) 35%, var(--border)); }
+    .result.fail { background: color-mix(in srgb, var(--red) 8%, var(--card)); border: 1px solid color-mix(in srgb, var(--red) 30%, var(--border)); }
+    .pilot-card p { color: var(--muted-foreground); font-size: 13px; margin: 0; }
+
+    .boundary { display: grid; gap: 12px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .boundary-block { border-radius: 15px; padding: 21px; }
+    .boundary-block.can { background: color-mix(in srgb, var(--green) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--green) 35%, var(--border)); }
+    .boundary-block.cannot { background: color-mix(in srgb, var(--red) 8%, var(--card)); border: 1px solid color-mix(in srgb, var(--red) 30%, var(--border)); }
+    .boundary-block h3 { font-size: 20px; margin: 0 0 12px; }
+    .boundary-block ul { margin: 0; padding-left: 21px; }
+    .boundary-block li + li { margin-top: 8px; }
+
+    .footer { border-top: 1px solid var(--border); color: var(--muted-foreground); display: flex; gap: 20px; justify-content: space-between; margin-top: 64px; padding-top: 18px; }
+    .footer p { margin: 0; }
+    code { background: var(--muted); border-radius: 5px; font-size: .9em; padding: 2px 5px; }
+
+    @media (max-width: 760px) {
+      .hero { display: block; }
+      .status { display: inline-block; margin-top: 22px; }
+      .claim, .boundary { grid-template-columns: 1fr; }
+      .claim-side { border-left: 0; border-top: 1px solid var(--border); padding: 20px 0 0; }
+      .families, .pilot-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .measure-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .section-heading { align-items: start; display: block; }
+      .section-heading p { margin-top: 9px; text-align: left; }
+    }
+    @media (max-width: 520px) {
+      .page { padding-left: 15px; padding-right: 15px; }
+      .status { white-space: normal; }
+      .flow { grid-template-columns: 1fr; }
+      .flow-arrow { transform: rotate(90deg); }
+      .families, .measure-grid, .pilot-grid { grid-template-columns: 1fr; }
+      .footer { display: block; }
+      .footer p + p { margin-top: 8px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="hero">
+      <div>
+        <div class="eyebrow">Elpis developer workflow benchmark · v0.1</div>
+        <h1>Can the work survive the long session?</h1>
+        <p class="lede">A fixed set of developer jobs compares the same model directly and through Elpis—on correctness first, then on continuity and resource use.</p>
+      </div>
+      <div class="status"><strong>PILOT ONLY</strong> · 2 tasks × 2 arms · full suite not run</div>
+    </header>
+
+    <section class="panel claim" aria-labelledby="claim-title">
+      <div>
+        <div class="label">The claim we are testing</div>
+        <h2 id="claim-title">Elpis should help an agent finish long, multi-step developer work without losing the important parts.</h2>
+      </div>
+      <div class="claim-side">
+        <p><strong>Primary proof</strong><span class="muted">Did the task finish correctly?</span></p>
+        <p><strong>Secondary proof</strong><span class="muted">What happened to time, tokens, context, tools, and failures?</span></p>
+        <p><strong>Not being claimed</strong><span class="muted">Universal superiority, model ranking, or real-world productivity.</span></p>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="pilot-title">
+      <div class="section-heading">
+        <h2 id="pilot-title">A small pilot is captured</h2>
+        <p>Enough to verify the path; nowhere near enough for a conclusion.</p>
+      </div>
+      <div class="pilot-grid">
+        <div class="pilot-card"><div class="pilot-top"><strong>contract_01</strong><span>exact JSON</span></div><div class="pilot-results"><span class="result direct">Direct <b>PASS</b></span><span class="result elpis">Elpis <b>PASS*</b></span></div><p>*The exact line was captured; the original runner stopped late and was independently rescored after the transcript-boundary fix.</p></div>
+        <div class="pilot-card"><div class="pilot-top"><strong>scoped_code_01</strong><span>repair + tests</span></div><div class="pilot-results"><span class="result direct">Direct <b>PASS</b></span><span class="result fail">Elpis <b>TIMEOUT</b></span></div><p>Elpis reached minimal reasoning, then made no edit before the 180-second limit.</p></div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="run-title">
+      <div class="section-heading">
+        <h2 id="run-title">One task. Two paths. Same check.</h2>
+        <p>The only intended difference is whether the model runs directly or inside Elpis.</p>
+      </div>
+      <div class="flow">
+        <div class="flow-step"><div class="number">01 / GIVE</div><h3>Fixed job</h3><p>Prompt, local files, rules, sandbox, and time limit.</p></div>
+        <div class="flow-arrow" aria-hidden="true">→</div>
+        <div class="flow-step"><div class="number">02 / RUN</div><h3>Two arms</h3><div class="arms"><div class="arm direct"><strong>Direct</strong><span>same model</span></div><div class="arm elpis"><strong>Elpis</strong><span>same model + Elpis</span></div></div></div>
+        <div class="flow-arrow" aria-hidden="true">→</div>
+        <div class="flow-step"><div class="number">03 / CHECK</div><h3>Hard evidence</h3><p>Tests, exact files, exact JSON, transcript, and failure class.</p></div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="families-title">
+      <div class="section-heading">
+        <h2 id="families-title">What the agent has to do</h2>
+        <p>Six families. Two tasks each. The last two are the Elpis stress cases.</p>
+      </div>
+      <div class="families">
+        <article class="family"><div class="family-top"><span class="family-dot" aria-hidden="true"></span><span class="family-count">2 tasks</span></div><h3>Follow the output rule</h3><p>Return exactly what was requested, with no extra words.</p><details><summary>Why it is here</summary><p>Sanity check. It confirms the runner and scorer before we interpret harder work.</p></details></article>
+        <article class="family"><div class="family-top"><span class="family-dot" aria-hidden="true"></span><span class="family-count">2 tasks</span></div><h3>Fix code, touch nothing else</h3><p>Repair a bug, run tests, and stay inside the allowed file.</p><details><summary>Why it is here</summary><p>Measures useful code work and whether edits remain inspectable.</p></details></article>
+        <article class="family"><div class="family-top"><span class="family-dot" aria-hidden="true"></span><span class="family-count">2 tasks</span></div><h3>Find facts in long files</h3><p>Use the right record, ignore drafts, and say “not found” when needed.</p><details><summary>Why it is here</summary><p>Measures retrieval and resistance to misleading context.</p></details></article>
+        <article class="family"><div class="family-top"><span class="family-dot" aria-hidden="true"></span><span class="family-count">2 tasks</span></div><h3>Complete a file workflow</h3><p>Read data, calculate, write an answer, and validate it.</p><details><summary>Why it is here</summary><p>Measures multi-step tool use rather than one-shot text generation.</p></details></article>
+        <article class="family"><div class="family-top"><span class="family-dot" aria-hidden="true"></span><span class="family-count">2 tasks</span></div><h3>Keep one fact through noise</h3><p>Search a large tool output and use one buried authoritative record.</p><details><summary>Why it is here</summary><p>This is where Elpis context control should matter; the important fact must survive irrelevant output.</p></details></article>
+        <article class="family"><div class="family-top"><span class="family-dot" aria-hidden="true"></span><span class="family-count">2 tasks</span></div><h3>Continue after a break</h3><p>Inspect in phase one, then repair in phase two after a session break.</p><details><summary>Why it is here</summary><p>This tests whether goals and decisions survive beyond one uninterrupted turn.</p></details></article>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="continuity-title">
+      <div class="section-heading">
+        <h2 id="continuity-title">The dedicated continuity check</h2>
+        <p>30 exact-string probes after a real long-session and restart sequence.</p>
+      </div>
+      <div class="panel claim">
+        <div>
+          <div class="label">Three groups of ten</div>
+          <h2>Remember the right facts. Reject the made-up ones.</h2>
+        </div>
+        <div class="claim-side">
+          <p><strong>Exact</strong><span class="muted">Recall the planted identifier directly.</span></p>
+          <p><strong>Paraphrase</strong><span class="muted">Find the same fact when the question changes.</span></p>
+          <p><strong>Negative</strong><span class="muted">Say ABSENT instead of inventing an identifier.</span></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="measure-title">
+      <div class="section-heading">
+        <h2 id="measure-title">What gets recorded</h2>
+        <p>Numbers are secondary; the task result is the first thing that matters.</p>
+      </div>
+      <div class="measure-grid">
+        <div class="measure"><strong>Finished correctly</strong><span>Primary yes/no result.</span></div>
+        <div class="measure"><strong>Files and tests</strong><span>What changed and whether it passed.</span></div>
+        <div class="measure"><strong>Context and tools</strong><span>Peak context, tool calls, pruning events.</span></div>
+        <div class="measure"><strong>Time and tokens</strong><span>Cost and speed when exposed.</span></div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="boundary-title">
+      <div class="section-heading"><h2 id="boundary-title">The honest boundary</h2></div>
+      <div class="boundary">
+        <div class="boundary-block can"><h3>This can show</h3><ul><li>How often each arm completes these fixed jobs.</li><li>Which failures are task failures versus provider or runner failures.</li><li>Whether Elpis changes context use or continuity on this suite.</li></ul></div>
+        <div class="boundary-block cannot"><h3>This cannot show yet</h3><ul><li>That Elpis is better for every project or model.</li><li>That lower context use improves task quality.</li><li>That the suite represents all real developer work.</li></ul></div>
+      </div>
+    </section>
+
+    <footer class="footer"><p>Task definitions and scorers live beside this page in <code>benchmark/</code>.</p><p>Pilot evidence captured; full suite not run.</p></footer>
+  </main>
+</body>
+</html>

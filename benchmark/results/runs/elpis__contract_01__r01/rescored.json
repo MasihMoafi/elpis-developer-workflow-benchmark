@@ -1,0 +1,9 @@
+{
+  "task": "contract_01",
+  "status": "pass",
+  "reason": "exact response line captured",
+  "derived_from": "transcript.txt",
+  "original_run_status": "timeout_before_score",
+  "original_score_file": "score.json",
+  "note": "Derived with the corrected one-line transcript fallback; raw run.json and score.json are unchanged."
+}

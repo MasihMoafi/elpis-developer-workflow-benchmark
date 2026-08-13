@@ -1,0 +1,22 @@
+{
+  "agent_binary_sha256": "1347bcf55b440479b1699d5689ba6f0d36989f055c02246016a6a26adfaec1c2",
+  "approval_mode": "never",
+  "arm": "elpis",
+  "benchmark_id": "elpis-developer-workflows-v0.1",
+  "completion_status": "timeout_before_score",
+  "end_to_end_pass": false,
+  "finished_at_utc": "2026-08-13T17:30:36Z",
+  "fixture_sha256": "",
+  "isolated_state": "per_run",
+  "model_id": "inclusionai/ling-3.0-flash",
+  "process_status": 124,
+  "prompt_sha256": "6e5617e7632785134f960faabf5f1da30b3125ca6deff4ab0bca8c9767e731e6",
+  "provider": "openrouter",
+  "raw_transcript": "transcript.txt",
+  "repetition": 1,
+  "run_id": "elpis__contract_01__r01",
+  "sandbox": "workspace-write",
+  "started_at_utc": "2026-08-13T17:28:35Z",
+  "task_id": "contract_01",
+  "workspace": "workspace"
+}

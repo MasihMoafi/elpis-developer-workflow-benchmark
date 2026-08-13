@@ -1,0 +1,5 @@
+Do not use tools and do not change files. Return exactly one line of JSON and
+nothing else:
+{"status":"ready","values":[3,8,13],"sum":24}
+Do not use a code fence or explanation.
+

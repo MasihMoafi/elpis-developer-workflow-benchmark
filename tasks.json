@@ -1,0 +1,10 @@
+{
+  "protocol_revision": "2026-08-13-recovered",
+  "tasks": [
+    {"id":"exact_contract","prompt":"prompts/exact_contract.md","fixture":null,"sandbox":"read-only"},
+    {"id":"code_scope","prompt":"prompts/code_scope.md","fixture":"fixtures/calculator","sandbox":"workspace-write"},
+    {"id":"long_context","prompt":"prompts/long_context.md","fixture":"fixtures/long-context","sandbox":"workspace-write"},
+    {"id":"tool_sequence","prompt":"prompts/tool_sequence.md","fixture":"fixtures/tool-sequence","sandbox":"workspace-write"}
+  ]
+}
+

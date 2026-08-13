@@ -1,0 +1,197 @@
+{
+  "benchmark_id": "elpis-developer-workflows-v0.1",
+  "version": "0.1.0",
+  "claim": "On fixed developer tasks, compare the same model running directly and through Elpis for correctness, continuity, and resource use.",
+  "comparison": {
+    "control": "same model without Elpis",
+    "treatment": "same model through Elpis",
+    "keep_constant": ["model", "provider", "prompt", "fixture", "sandbox", "approval policy", "time limit"]
+  },
+  "score_policy": {
+    "primary": "end_to_end_pass",
+    "secondary": ["elapsed_seconds", "input_tokens", "output_tokens", "peak_context_tokens", "tool_calls", "failure_class"],
+    "infrastructure_is_not_model_failure": ["provider_error", "launcher_error", "timeout_before_evaluation"]
+  },
+  "sub_benchmarks": [
+    {
+      "id": "continuity_recall",
+      "question": "After a real long-session and restart sequence, can the system recover planted working-state facts without inventing absent facts?",
+      "cases": "continuity/cases.tsv",
+      "fixture": "continuity/fixture.md",
+      "scorer": "continuity/score.rs",
+      "groups": ["exact", "semantic", "negative"],
+      "cases_per_group": 10,
+      "planned_repetitions_per_arm": 10,
+      "source": "Elpis docs/evals/context-continuity"
+    }
+  ],
+  "task_families": [
+    {
+      "id": "contract",
+      "label": "Follow the output rule",
+      "purpose": "sanity check for exact instruction following",
+      "elpis_signal": "baseline only"
+    },
+    {
+      "id": "scoped_code",
+      "label": "Fix code without collateral edits",
+      "purpose": "test coding, tests, and edit boundaries",
+      "elpis_signal": "tool use and evidence"
+    },
+    {
+      "id": "long_retrieval",
+      "label": "Find facts in long context",
+      "purpose": "test retrieval, contradiction handling, and saying not found",
+      "elpis_signal": "context pressure"
+    },
+    {
+      "id": "tool_workflow",
+      "label": "Complete a multi-step file task",
+      "purpose": "test read, calculate, write, and validate loops",
+      "elpis_signal": "tool sequence"
+    },
+    {
+      "id": "context_pressure",
+      "label": "Keep the important fact through noisy output",
+      "purpose": "test whether long tool output harms final correctness",
+      "elpis_signal": "pruning and context control"
+    },
+    {
+      "id": "continuity",
+      "label": "Continue work after an interruption",
+      "purpose": "test whether goals and decisions survive a new turn or session",
+      "elpis_signal": "continuity"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "contract_01",
+      "family": "contract",
+      "title": "Return one exact JSON line",
+      "prompt": "prompts/contract_01.md",
+      "fixture": null,
+      "score": "exact_response",
+      "expected": "{\"status\":\"ready\",\"values\":[5,11,19],\"sum\":35}",
+      "source_claim": "Elpis should keep a strict user contract visible while the model works."
+    },
+    {
+      "id": "contract_02",
+      "family": "contract",
+      "title": "Reject extra explanation",
+      "prompt": "prompts/contract_02.md",
+      "fixture": null,
+      "score": "exact_response",
+      "expected": "{\"status\":\"ready\",\"values\":[2,7,18],\"sum\":27}",
+      "source_claim": "Elpis should preserve output constraints without relying on a human judge."
+    },
+    {
+      "id": "scoped_code_01",
+      "family": "scoped_code",
+      "title": "Repair a discount calculation",
+      "prompt": "prompts/scoped_code_01.md",
+      "fixture": "fixtures/scoped_refactor_01",
+      "score": "python_tests_and_scope",
+      "allowed_changes": ["calculator.py"],
+      "source_claim": "Elpis should make consequential edits inspectable and bounded."
+    },
+    {
+      "id": "scoped_code_02",
+      "family": "scoped_code",
+      "title": "Repair slug normalization",
+      "prompt": "prompts/scoped_code_02.md",
+      "fixture": "fixtures/scoped_refactor_02",
+      "score": "python_tests_and_scope",
+      "allowed_changes": ["slugify.py"],
+      "source_claim": "Elpis should preserve the workspace and permission contract while an agent edits code."
+    },
+    {
+      "id": "long_retrieval_01",
+      "family": "long_retrieval",
+      "title": "Use authoritative rows and abstain",
+      "prompt": "prompts/long_retrieval_01.md",
+      "fixture": "fixtures/long_retrieval_01",
+      "score": "json_artifact_and_scope",
+      "expected_file": "answer.json",
+      "expected_json": {"project_code":"Aster-17","launch_day":"Thursday","retention_days":28,"owner":"Nilo","support_tier":"NOT_FOUND"},
+      "source_claim": "Elpis should keep the right context and preserve an explicit not-found result instead of inventing data."
+    },
+    {
+      "id": "long_retrieval_02",
+      "family": "long_retrieval",
+      "title": "Resolve a conflicting record",
+      "prompt": "prompts/long_retrieval_02.md",
+      "fixture": "fixtures/long_retrieval_02",
+      "score": "json_artifact_and_scope",
+      "expected_file": "answer.json",
+      "expected_json": {"service":"billing-api","owner":"Laleh","severity":"high","status":"investigating","region":"eu-west"},
+      "source_claim": "Elpis should retain authoritative evidence when long context contains drafts and contradictions."
+    },
+    {
+      "id": "tool_workflow_01",
+      "family": "tool_workflow",
+      "title": "Summarize completed events",
+      "prompt": "prompts/tool_workflow_01.md",
+      "fixture": "fixtures/tool_workflow_01",
+      "score": "json_artifact_and_scope",
+      "expected_file": "answer.json",
+      "expected_json": {"completed_count":4,"completed_owners":["aisha","mika","zara"],"highest_priority_open":"evt-207"},
+      "source_claim": "Elpis should support a visible read-calculate-write tool loop."
+    },
+    {
+      "id": "tool_workflow_02",
+      "family": "tool_workflow",
+      "title": "Calculate a small inventory report",
+      "prompt": "prompts/tool_workflow_02.md",
+      "fixture": "fixtures/tool_workflow_02",
+      "score": "json_artifact_and_scope",
+      "expected_file": "answer.json",
+      "expected_json": {"sku_count":5,"units_total":74,"reorder":["cable-usb-c","filter-air"]},
+      "source_claim": "Elpis should carry intermediate tool results into a validated final artifact."
+    },
+    {
+      "id": "context_pressure_01",
+      "family": "context_pressure",
+      "title": "Keep one fact through a noisy log",
+      "prompt": "prompts/context_pressure_01.md",
+      "fixture": "fixtures/pressure_log_01",
+      "score": "python_tests_and_scope",
+      "allowed_changes": ["settings.py"],
+      "pressure_output_chars": 120000,
+      "source_claim": "Elpis should reduce irrelevant tool history without losing the fact needed for the final edit."
+    },
+    {
+      "id": "context_pressure_02",
+      "family": "context_pressure",
+      "title": "Find a buried incident and write the answer",
+      "prompt": "prompts/context_pressure_02.md",
+      "fixture": "fixtures/pressure_log_02",
+      "score": "json_artifact_and_scope",
+      "expected_file": "answer.json",
+      "expected_json": {"incident_id":"inc-8841","root_cause":"expired signing certificate","owner":"Nilo","priority":1},
+      "pressure_output_chars": 120000,
+      "source_claim": "Elpis should preserve useful evidence pointers while noisy exploration is pruned."
+    },
+    {
+      "id": "continuity_01",
+      "family": "continuity",
+      "title": "Continue a planned code repair",
+      "prompt": ["prompts/continuity_01_phase1.md","prompts/continuity_01_phase2.md"],
+      "fixture": "fixtures/continuity_resume_01",
+      "score": "phase_continuity_and_scope",
+      "allowed_changes": ["service.py"],
+      "phases": 2,
+      "source_claim": "Elpis says goals and decisions survive compaction, model switches, and restarts."
+    },
+    {
+      "id": "continuity_02",
+      "family": "continuity",
+      "title": "Resume after a session break",
+      "prompt": ["prompts/continuity_02_phase1.md","prompts/continuity_02_phase2.md"],
+      "fixture": "fixtures/continuity_resume_02",
+      "score": "phase_continuity_and_scope",
+      "allowed_changes": ["release.py"],
+      "phases": 2,
+      "source_claim": "Elpis should let work resume without replaying the full transcript."
+    }
+  ]
+}
