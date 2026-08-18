@@ -1,0 +1,7 @@
+{
+  "task": "exact_contract",
+  "run_id": "ling_tiny__exact_contract__r03",
+  "status": "pass",
+  "reason": "Exact JSON returned without fences",
+  "elapsed_seconds": 4.39
+}

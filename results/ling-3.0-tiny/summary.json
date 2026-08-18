@@ -1,0 +1,38 @@
+{
+  "exact_contract": {
+    "pass": 3,
+    "total": 3,
+    "times": [
+      56.64,
+      4.38,
+      4.39
+    ]
+  },
+  "code_scope": {
+    "pass": 0,
+    "total": 3,
+    "times": [
+      66.44,
+      60.1,
+      58.54
+    ]
+  },
+  "long_context": {
+    "pass": 3,
+    "total": 3,
+    "times": [
+      65.11,
+      54.95,
+      55.13
+    ]
+  },
+  "tool_sequence": {
+    "pass": 3,
+    "total": 3,
+    "times": [
+      61.16,
+      58.57,
+      58.56
+    ]
+  }
+}

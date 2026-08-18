@@ -1,0 +1,7 @@
+{
+  "task": "code_scope",
+  "run_id": "ling_tiny__code_scope__r03",
+  "status": "fail",
+  "reason": "Missing discount truncation or strict contract format",
+  "elapsed_seconds": 58.54
+}

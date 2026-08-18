@@ -1,0 +1,7 @@
+{
+  "task": "long_context",
+  "run_id": "ling_tiny__long_context__r03",
+  "status": "pass",
+  "reason": "Exact needle data extracted from AUTHORITATIVE row",
+  "elapsed_seconds": 55.13
+}

@@ -1,0 +1,7 @@
+{
+  "task": "tool_sequence",
+  "run_id": "ling_tiny__tool_sequence__r02",
+  "status": "pass",
+  "reason": "Correct aggregation, sorted unique owners, and priority ID",
+  "elapsed_seconds": 58.57
+}
