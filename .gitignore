@@ -7,3 +7,7 @@ results/runs/*
 !results/runs/.gitkeep
 benchmark/results/runs/*/elpis-state/
 benchmark/results/runs/*/workspace/.git/
+
+# Private notes, kept locally
+/ES.md
+/VISION.md
